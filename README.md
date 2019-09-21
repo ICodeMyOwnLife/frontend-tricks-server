@@ -4,7 +4,7 @@
 
 1. [Install Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
 
-1. Deploy Create React App project
+1. Deploy a Create React App project to Heroku
 
    ```bash
    heroku create frontend-tricks-web -b https://github.com/mars/create-react-app-buildpack.git
@@ -16,12 +16,12 @@
    heroku open
    ```
 
-1. Deploy to Heroku
+1. Deploy a NodeJS project to Heroku
 
    ```bash
-   heroku create frontend-tricks
+   heroku create frontend-tricks-server
 
-   git remote add heroku https://git.heroku.com/frontend-tricks.git
+   git remote add heroku https://git.heroku.com/frontend-tricks-server.git
 
    git push heroku master
 

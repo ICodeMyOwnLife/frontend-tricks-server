@@ -50,8 +50,10 @@
 
 1. [[GitHub] Heroku Buildpack for create-react-app](https://github.com/mars/create-react-app-buildpack#user-content-requires)
 
-1) [[Create React App] Deployment](https://create-react-app.dev/docs/deployment)
+1. [[Create React App] Deployment](https://create-react-app.dev/docs/deployment)
 
-1) [[Heroku] Creating a Self-Signed SSL Certificate](https://devcenter.heroku.com/articles/ssl-certificate-self)
+1. [[Heroku] Creating a Self-Signed SSL Certificate](https://devcenter.heroku.com/articles/ssl-certificate-self)
 
-1) [[Heroku] Getting Started on Heroku with Node.js](https://devcenter.heroku.com/articles/getting-started-with-nodejs?singlepage=true)
+1. [[Heroku] Getting Started on Heroku with Node.js](https://devcenter.heroku.com/articles/getting-started-with-nodejs?singlepage=true)
+
+1. [[Heroku] Deploying Node.js Apps on Heroku](https://devcenter.heroku.com/articles/deploying-nodejs#advanced-http-features)

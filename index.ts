@@ -18,7 +18,7 @@ const app = express();
 const upload = multer({ dest: "uploads/" });
 
 const exportHandler = (req: Request, res: Response) => {
-  const count: number = Number(req.body.count || req.query.count) || 10;
+  const count = Number(req.body.count || req.query.count) || 10;
   const values = Array(count)
     .fill(0)
     .map((_, idx) => ({ id: idx, value: Math.round(Math.random() * 10000) }));
@@ -35,6 +35,14 @@ const longHandler = async (req: Request, res: Response) => {
   const duration = Number(req.body.duration || req.query.duration) || 3000;
   await delay(duration);
   res.status(200).send({ message: "OK" });
+};
+
+const memoryUsageHandler = (req: Request, res: Response) => {
+  const length = Number(req.body.length || req.query.length) || 100000000;
+  const array = Array.from({ length }, () => 5);
+  array.reverse();
+  const { external, heapTotal, heapUsed, rss } = process.memoryUsage();
+  res.status(200).send({ external, heapTotal, heapUsed, rss });
 };
 
 app.use(morgan("dev"));
@@ -78,6 +86,11 @@ app
   .get(longHandler)
   .post(longHandler);
 
+app
+  .route("/memory-usage")
+  .get(memoryUsageHandler)
+  .post(memoryUsageHandler);
+
 app.post("/upload-single", upload.single("single-file"), (req, res) => {
   const { originalname, size } = req.file;
   const redirect = req.body.redirect as string;
@@ -95,7 +108,6 @@ app.post("/upload-multiple", upload.array("multiple-files"), (req, res) => {
 });
 
 const server = app.listen(Number(process.env.PORT) || 1333, () =>
-  // eslint-disable-next-line no-console
   console.log(
     `Server started on port ${(server.address() as AddressInfo).port}`
   )

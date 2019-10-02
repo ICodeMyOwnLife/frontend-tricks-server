@@ -1,3 +1,4 @@
+import { join } from "path";
 import { AddressInfo } from "net";
 import express, { Request, Response } from "express";
 import morgan from "morgan";
@@ -5,7 +6,7 @@ import serveStatic from "serve-static";
 import bodyParser from "body-parser";
 import contentDisposition from "content-disposition";
 import cors from "cors";
-import { join } from "path";
+import multer from "multer";
 import { delay } from "bluebird";
 
 const DIR_STATIC = join(__dirname, "..", "static");
@@ -14,6 +15,7 @@ const HEADER_CONTENT_TYPE = "Content-Type";
 const HEADER_CONTENT_DISPOSITION = "Content-Disposition";
 
 const app = express();
+const upload = multer({ dest: "uploads/" });
 
 const exportHandler = (req: Request, res: Response) => {
   const count: number = Number(req.body.count || req.query.count) || 10;
@@ -75,6 +77,22 @@ app
   .route("/long")
   .get(longHandler)
   .post(longHandler);
+
+app.post("/upload-single", upload.single("single-file"), (req, res) => {
+  const { originalname, size } = req.file;
+  const redirect = req.body.redirect as string;
+  console.log(`Uploaded ${originalname} (${size} bytes)`);
+  redirect
+    ? res.redirect(redirect)
+    : res.status(200).send({ originalname, size });
+});
+
+app.post("/upload-multiple", upload.array("multiple-files"), (req, res) => {
+  const { length } = req.files as Express.Multer.File[];
+  const redirect = req.body.redirect as string;
+  console.log(`Uploaded ${length} files`);
+  redirect ? res.redirect(redirect) : res.status(200).send({ length });
+});
 
 const server = app.listen(Number(process.env.PORT) || 1333, () =>
   // eslint-disable-next-line no-console

@@ -94,17 +94,17 @@ app
 app.post("/upload-single", upload.single("single-file"), (req, res) => {
   const { originalname, size } = req.file;
   const redirect = req.body.redirect as string;
-  console.log(`Uploaded ${originalname} (${size} bytes)`);
-  redirect
-    ? res.redirect(redirect)
-    : res.status(200).send({ originalname, size });
+  const responseBody = { ...req.body, originalname, size };
+  console.log(responseBody);
+  redirect ? res.redirect(redirect) : res.status(200).send(responseBody);
 });
 
 app.post("/upload-multiple", upload.array("multiple-files"), (req, res) => {
   const { length } = req.files as Express.Multer.File[];
   const redirect = req.body.redirect as string;
-  console.log(`Uploaded ${length} files`);
-  redirect ? res.redirect(redirect) : res.status(200).send({ length });
+  const responseBody = { ...req.body, length };
+  console.log(responseBody);
+  redirect ? res.redirect(redirect) : res.status(200).send(responseBody);
 });
 
 const server = app.listen(Number(process.env.PORT) || 1333, () =>

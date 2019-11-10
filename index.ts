@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 import contentDisposition from "content-disposition";
 import cors from "cors";
 import multer from "multer";
+import { UAParser } from "ua-parser-js";
 import { delay } from "bluebird";
 
 const DIR_STATIC = join(__dirname, "..", "static");
@@ -43,6 +44,12 @@ const memoryUsageHandler = (req: Request, res: Response) => {
   array.reverse();
   const { external, heapTotal, heapUsed, rss } = process.memoryUsage();
   res.status(200).send({ external, heapTotal, heapUsed, rss });
+};
+
+const userAgentHandler = (req: Request, res: Response) => {
+  const parser = new UAParser(req.header("user-agent"));
+  const result = parser.getResult();
+  res.status(200).send(result);
 };
 
 app.use(morgan("dev"));
@@ -90,6 +97,11 @@ app
   .route("/memory-usage")
   .get(memoryUsageHandler)
   .post(memoryUsageHandler);
+
+app
+  .route("/user-agent")
+  .get(userAgentHandler)
+  .post(userAgentHandler);
 
 app.post("/upload-single", upload.single("single-file"), (req, res) => {
   const { originalname, size } = req.file;

@@ -9,6 +9,10 @@ import cors from "cors";
 import multer from "multer";
 import { UAParser } from "ua-parser-js";
 import { delay } from "bluebird";
+import Axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const DIR_STATIC = join(__dirname, "..", "static");
 const DIR_PUBLIC = join(__dirname, "..", "public");
@@ -117,6 +121,16 @@ app.post("/upload-multiple", upload.array("multiple-files"), (req, res) => {
   const responseBody = { ...req.body, length };
   console.log(responseBody);
   redirect ? res.redirect(redirect) : res.status(200).send(responseBody);
+});
+
+app.post("/verify-recaptcha", async (req, res) => {
+  const token = req.body.token as string;
+  const response = await Axios.request({
+    data: { response: token, secret: process.env.RECAPTCHA_V3_SECRET_KEY },
+    method: "POST",
+    url: `https://www.google.com/recaptcha/api/siteverify`
+  });
+  res.status(200).send(response.data);
 });
 
 const server = app.listen(Number(process.env.PORT) || 1333, () =>

@@ -125,9 +125,13 @@ app.post("/upload-multiple", upload.array("multiple-files"), (req, res) => {
 
 app.post("/verify-recaptcha", async (req, res) => {
   const token = req.body.token as string;
+  const params = {
+    response: token,
+    secret: process.env.RECAPTCHA_V3_SECRET_KEY
+  };
   const response = await Axios.request({
-    data: { response: token, secret: process.env.RECAPTCHA_V3_SECRET_KEY },
     method: "POST",
+    params,
     url: `https://www.google.com/recaptcha/api/siteverify`
   });
   res.status(200).send(response.data);

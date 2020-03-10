@@ -56,6 +56,19 @@ const userAgentHandler = (req: Request, res: Response) => {
   res.status(200).send(result);
 };
 
+const createSetHeaders = (type: string) => (res: Response, path: string) =>
+  res.setHeader(HEADER_CONTENT_DISPOSITION, contentDisposition(path, { type }));
+
+const verifyReCaptchaToken = async (response: string, secret: string) => {
+  const params = { response, secret };
+  const res = await Axios.request({
+    method: "POST",
+    params,
+    url: `https://www.google.com/recaptcha/api/siteverify`
+  });
+  return res.data;
+};
+
 app.use(morgan("dev"));
 app.use(cors({ exposedHeaders: [HEADER_CONTENT_DISPOSITION] }));
 app.use(bodyParser.json({}));
@@ -66,24 +79,14 @@ app.use(bodyParser.raw({}));
 app.use(
   "/static",
   serveStatic(DIR_STATIC, {
-    setHeaders: (res, path) => {
-      res.setHeader(
-        HEADER_CONTENT_DISPOSITION,
-        contentDisposition(path, { type: "attachment" })
-      );
-    }
+    setHeaders: createSetHeaders("attachment")
   })
 );
 
 app.use(
   "/public",
   serveStatic(DIR_PUBLIC, {
-    setHeaders: (res, path) => {
-      res.setHeader(
-        HEADER_CONTENT_DISPOSITION,
-        contentDisposition(path, { type: "inline" })
-      );
-    }
+    setHeaders: createSetHeaders("inline")
   })
 );
 
@@ -123,18 +126,20 @@ app.post("/upload-multiple", upload.array("multiple-files"), (req, res) => {
   redirect ? res.redirect(redirect) : res.status(200).send(responseBody);
 });
 
-app.post("/verify-recaptcha", async (req, res) => {
-  const token = req.body.token as string;
-  const params = {
-    response: token,
-    secret: process.env.RECAPTCHA_V3_SECRET_KEY
-  };
-  const response = await Axios.request({
-    method: "POST",
-    params,
-    url: `https://www.google.com/recaptcha/api/siteverify`
-  });
-  res.status(200).send(response.data);
+app.post("/verify-recaptcha-v3", async (req, res) => {
+  const data = await verifyReCaptchaToken(
+    req.body.response,
+    process.env.RECAPTCHA_V3_SECRET_KEY!
+  );
+  res.status(200).send(data);
+});
+
+app.post("/verify-recaptcha-checkbox", async (req, res) => {
+  const data = await verifyReCaptchaToken(
+    req.body.response,
+    process.env.RECAPTCHA_CHECKBOX_SECRET_KEY!
+  );
+  res.status(200).send(data);
 });
 
 const server = app.listen(Number(process.env.PORT) || 1333, () =>

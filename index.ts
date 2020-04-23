@@ -149,7 +149,9 @@ app.post("/verify-recaptcha-checkbox", async (req, res) => {
 app.get("/with-referrer", (req, res) => {
   const referrer = req.header("referrer");
   const redirect = req.query.redirect;
-  res.redirect(referrer ? `${redirect}?referrer=${referrer}` : redirect);
+  res.redirect(
+    referrer ? `${redirect}?referrer=${referrer}` : String(redirect)
+  );
 });
 
 const server = app.listen(Number(process.env.PORT) || 1333, () =>

@@ -29,7 +29,8 @@
     "typescript": "^3.6.3"
   },
   "scripts": {
-    "build": "tsc -w -p .",
+    "build": "tsc -p .",
+    "build:watch": "tsc -w -p .",
     "start": "node build/index.js"
   }
 }
